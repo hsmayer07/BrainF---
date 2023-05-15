@@ -9,6 +9,8 @@ int ptr = 0;
 int pc = 0;
 int max = 1003;
 int mag = 0;
+
+
 void interpreter(program *executable) {
 	int size = executable -> size;
 
@@ -16,11 +18,11 @@ void interpreter(program *executable) {
 		tape[i] = 0;
 	}
 
-	instruction currentInstruction;
+	Opcode_t currentInstruction;
 	char wentBack = (char) 0;
-	while(pc < size && mag < max){
-		currentInstruction = executable -> instructions[pc];
-		printf("PC = %d. Instruction = %d. ptr =  %d \n", pc, currentInstruction, ptr);
+	while(pc < size){
+		currentInstruction = executable -> instructions[pc].opcode;
+		//printf("PC = %d. Instruction = %d. ptr =  %d \n", pc, currentInstruction, ptr);
 		switch(currentInstruction) {
 			case INC: 
 				tape[ptr] ++;
@@ -43,17 +45,13 @@ void interpreter(program *executable) {
 				tape[ptr] = (char) fgetc(stdin);
 				break;
 			case BB:
-				push(pc);
+				if(tape[ptr] == 0) {
+					pc = executable -> instructions[pc].operand;
+				}
 				break;
 			case BR:
 				if(tape[ptr] != 0) {
-					printf("Val = %d, ptr = %d \n", tape[ptr], ptr);
-					int temp = pop();
-					if(temp == -1) {
-						fprintf(stderr, "Illegal Syntax Exception: Unbalanced bracket found at %d, stack size = %d, ptr = %d. Terminating. \n", pc, getSize(), ptr);
-						return;
-					}
-					pc = temp;
+					pc = executable -> instructions[pc].operand;
 					wentBack = (char) 1;
 				}
 				break;
@@ -69,8 +67,5 @@ void interpreter(program *executable) {
 		mag++;
 	}
 	printf("Finished. Executed %d instructions in total \n", mag);
-	for(int i = 0; i < LENGTH; i++) {
-		printf("%d, ", tape[i]);
-	}
 
 }

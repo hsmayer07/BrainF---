@@ -2,28 +2,27 @@
 #include <stdlib.h>
 #include "brain.h"
 
-Stack_t *head = NULL;
-int size = 0;
 
-void push(int value) {
-	//printf("Called to PUSH!!\n");
+void push(int value, Stackptr *h) {
+	Stack_t *head = h -> head;
 	if(head == NULL) {
 		head = malloc(sizeof(Stack_t));
 		head -> prev = NULL;
 		head -> value = value;
 		head -> next = NULL;
+		h -> head = head;
 	} else {
 		head -> next = malloc(sizeof(Stack_t));
 		head -> next -> prev = head; 
 		head -> next -> next = NULL;
 		head -> next -> value = value;
-		head = head -> next;
+		h -> head = head -> next;
 	}
-	size++;
+	h -> size ++;
 }
 
-int pop() {
-	//printf("Called to POP!!\n");
+int pop(Stackptr *h) {
+	Stack_t *head = h -> head;
 	if(head == NULL) {
 		return -1;
 	}
@@ -31,24 +30,21 @@ int pop() {
 	if(head -> prev != NULL) {
 		Stack_t *tempS = head -> prev;
 		free(head);
-		head = tempS;
+		h -> head = tempS;
 		head -> next = NULL;
 	} else {
 		free(head);
-		head = NULL;
+		h -> head = NULL;
 	}
-	size--;
+	h -> size --;
 	return temp;
 }
 
-int peek() {
+int peek(Stack_t *head) {
 	if(head != NULL) {
 		return head -> value;
 	}
 	return -1;
 }
 
-int getSize() {
-	return size;
-}
 
